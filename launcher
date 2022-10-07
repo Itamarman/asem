@@ -1,0 +1,12 @@
+[autoexec]
+@echo off
+mount C: "C:\tasm\BIN"
+C:
+cls
+base.exe
+echo.
+echo.
+echo.
+echo Program successfully executed !
+pause
+exit

@@ -1,0 +1,104 @@
+IDEAL
+MODEL small
+STACK 100h
+Player_Y = 97
+Player_X = 27
+Player_LY = 103
+Player_RX = 33
+Player_Color = 4
+Tower_Color = 255
+Remove_Color = 0
+DATASEG
+; --------------------------
+PlayerY db 100 
+NextUpdate db 0
+LastSecond db 60
+LastMinute db 60
+LastHour db 24
+DrawX dw Player_X
+DrawY dw Player_Y
+RightX dw Player_RX
+LowerY dw Player_LY
+DrawColor db 4
+
+; --------------------------
+CODESEG
+proc DrawPixel
+push ax
+push bx
+push cx
+push dx
+
+mov ah, 0ch
+mov al, [DrawColor]
+mov bh, 0
+mov cx, [DrawX]
+mov dx, [DrawY]
+int 10h
+
+pop dx
+pop cx
+pop bx
+pop ax
+ret
+endp DrawPixel
+
+proc DrawRect
+mov [DrawX],27
+;mov dx, [DrawY]
+L2:
+mov [DrawY],97
+L1:
+call DrawPixel
+inc [DrawY]
+cmp [DrawY], 103
+jne L1
+inc [DrawX]
+cmp  [DrawX],33
+jne L2
+ret
+endp DrawRect
+start:
+    mov ax, @data
+    mov ds, ax
+; --------------------------
+;activate graphics mode
+mov ax, 13h
+int 10h
+mov [DrawX],Player_X
+mov [DrawY],Player_Y
+mov [DrawColor],Player_Color
+call DrawRect
+;start game loop
+GameLoop:
+;get current time
+mov ah,2ch
+int 21h
+;check if enough time has passed
+cmp dl, [NextUpdate]
+jg AfterTest
+cmp dh, [LastSecond]
+jg AfterTest
+cmp cl, [LastMinute]
+jg AfterTest
+cmp ch, [LastHour]
+jg AfterTest
+jmp GameLoop
+AfterTest:
+;update time
+mov [NextUpdate], dl
+add [NextUpdate], 4 ;game speed
+mov [LastSecond], dh
+mov [LastMinute], cl
+mov [LastHour], ch
+;game step start
+
+
+
+;jmp GameLoop 
+; --------------------------
+    
+exit:
+    mov ax, 4c00h
+    int 21h
+END start

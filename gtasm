@@ -1,0 +1,7 @@
+[autoexec]
+@echo off
+mount C: "C:\tasm\BIN"
+C:
+cls
+tasm.exe base.asm >gtasm.log
+exit
